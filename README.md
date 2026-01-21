@@ -99,6 +99,37 @@ If you are testing a mobile website or a Progressive Web App (PWA), you can use 
 *   **Chrome/Edge**: Right-click > **Inspect** > Click the **Device Toggle** icon (phone/tablet) in the top-left of the inspector.
 *   **Safari**: Go to **Develop** > **Enter Responsive Design Mode**.
 
+## Test Automation Framework: MyObservatory 9-Day Forecast
+
+This project uses Python, Appium, and Behave (BDD) to automate test cases for the MyObservatory app's 9-Day Forecast feature.
+
+### Structure
+- `features/9_day_forecast.feature`: Gherkin scenarios for the 9-Day Forecast
+- `features/steps/`: Step definitions for Behave
+- `utils/appium_driver.py`: Appium driver setup
+
+### Setup
+1. Install Python 3.9+
+2. Create and activate a virtual environment
+3. Install dependencies:
+   ```sh
+   pip install behave appium-python-client
+   ```
+4. Start the Appium server:
+   ```sh
+   appium
+   ```
+5. Update `utils/appium_driver.py` with your app path and device details.
+
+### Running Tests
+```sh
+behave features/9_day_forecast.feature
+```
+
+### Notes
+- Ensure the Appium server is running and the iOS simulator/device is available.
+- Scenarios are based on the requirements in `test_cases_9_day_forecast.md`.
+
 ## Summary of Your Environment
 
 *   **iOS**: ✅ Ready. You have Xcode 26.3 and simulators for iPhone 17, 16, and various iPads.
