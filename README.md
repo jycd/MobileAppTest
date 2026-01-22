@@ -1,136 +1,91 @@
-# How to Test Mobile Apps Without a Real Device
+# MyObservatory 9-Day Forecast Test Automation
 
-Testing mobile applications without a physical device is a standard practice in mobile development. This guide outlines the methods available to you, tailored to your current environment (macOS with Xcode installed).
+This project contains automated tests for the "9-Day Forecast" feature of the MyObservatory iOS application using Python, Appium, and Behave (BDD).
 
-## 1. iOS Simulator (Ready to Use)
+## Prerequisites
 
-Since you have Xcode installed, you already have access to a robust set of iOS Simulators. These allow you to test your app on various iPhone and iPad models.
+*   **Python 3.9+**
+*   **Appium Server** (v2.0+ recommended)
+*   **Xcode** (for iOS Simulator)
+*   **MyObservatory.app** build (Simulator build)
 
-### How to Launch a Simulator
+## Installation
 
-**Method A: Via Xcode**
-1. Open **Xcode**.
-2. Go to the **Xcode** menu > **Open Developer Tool** > **Simulator**.
-3. Once the Simulator app opens, you can switch devices via **File** > **Open Simulator**.
+1.  **Clone the repository** (if applicable) or navigate to the project directory.
 
-**Method B: Via Terminal**
-You can boot a specific device directly from the command line.
-1. List available devices:
-   ```bash
-   xcrun simctl list devices available
-   ```
-2. Boot a specific device (replace `<UUID>` with the ID from the list above):
-   ```bash
-   xcrun simctl boot <UUID>
-   open -a Simulator
-   ```
+2.  **Create a Virtual Environment:**
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
 
-### Installing Your App
-If you have a `.app` build file, you can simply drag and drop it onto the Simulator window to install it.
+3.  **Install Dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## 2. What If I Don't Have Xcode?
+## Configuration
 
-If you are not on macOS, or simply don't want to install the massive Xcode package, you have other options:
+The test execution can be configured using environment variables. The default configuration in `utils/appium_driver.py` targets an iPhone Simulator.
 
-### A. Cloud-Based Simulators (Best for No-Install)
-Services like **Appetize.io** allow you to upload your `.app` or `.apk` file and run it directly in your web browser. This is the quickest way to test an iOS app without owning a Mac or installing Xcode.
+**Environment Variables:**
 
-### B. Expo (For React Native Developers)
-If you are building your app with React Native and Expo, you don't need Xcode to test.
-1.  **Expo Go**: Install the Expo Go app on your physical Android/iOS device.
-2.  **Web Preview**: Run `npx expo start --web` to test the logic in a browser.
-3.  **Expo Snack**: Use [snack.expo.dev](https://snack.expo.dev) to write and test code entirely in the browser.
+*   `APP_PATH`: Path to the `.app` file (Default: `/path/to/MyObservatory.app`)
+*   `PLATFORM_NAME`: Mobile platform (Default: `iOS`)
+*   `DEVICE_NAME`: Device name (Default: `iPhone Simulator`)
+*   `PLATFORM_VERSION`: iOS version (Default: `17.2`)
+*   `APPIUM_URL`: Appium server URL (Default: `http://localhost:4723`)
 
-### C. Cross-Platform Frameworks
-If you are on Windows or Linux, you cannot install Xcode. You must rely on:
-*   **Android Emulator**: Works perfectly on Windows/Linux (see below).
-*   **Cloud Device Farms**: The only way to test iOS apps from Windows/Linux without a Mac.
+## Running Tests
 
-## 3. Android Emulator (Setup Required)
+1.  **Start Appium Server:**
+    Open a new terminal and run:
+    ```bash
+    appium
+    ```
 
-It appears that the Android SDK is not currently configured in the standard location on your machine. To test Android apps, you will need to set up the Android Emulator.
+2.  **Run Tests with Behave:**
+    In the project root, run:
+    ```bash
+    # Run all features
+    behave
 
-### How to Set Up
-1. **Download Android Studio**: Go to [developer.android.com/studio](https://developer.android.com/studio) and download the latest version for macOS.
-2. **Install**: Run the installer and follow the setup wizard. Ensure you check the box for "Android Virtual Device" (AVD).
-3. **Create a Virtual Device**:
-   - Open Android Studio.
-   - Click on **More Actions** > **Virtual Device Manager**.
-   - Click **Create Device**, select a phone model (e.g., Pixel 8), and download a system image (e.g., Android 15).
-   - Click **Finish** and then the **Play** button to launch the emulator.
+    # Run specific feature
+    behave features/9_day_forecast.feature
+    ```
 
-### Running Apps
-Once the emulator is running, you can drag and drop `.apk` files onto the emulator window to install them.
+3.  **Generate Allure Report (Optional):**
+    To generate and view the Allure test report:
+    ```bash
+    # Run tests and generate results
+    behave -f allure_behave.formatter:AllureFormatter -o allure-results
 
-## 4. Testing Apps from App Store or Google Play
+    # Serve the report
+    allure serve allure-results
+    ```
 
-A common challenge is testing an app that is already published on the App Store or Google Play when you don't have a real device.
+## Project Structure
 
-### iOS (App Store)
-**Crucial Limitation:** You **cannot** install the App Store on the iOS Simulator. The Simulator is designed for development, not for consumer use. It runs on x86 (Intel) or ARM (Apple Silicon) architecture, but it lacks the signed production environment required for the App Store.
+*   `features/`: Contains Gherkin feature files (`.feature`).
+*   `features/steps/`: Contains Python step definitions (`.py`).
+*   `utils/`: Contains utility scripts like `appium_driver.py`.
+*   `requirements.txt`: Python dependencies.
+*   `behave.ini`: Behave configuration.
 
-**Workarounds:**
-1.  **Ask the Developer for a Simulator Build:** If you are working with a dev team, ask them for a `.app` file built specifically for the Simulator (x86_64 or arm64-simulator).
-2.  **TestFlight:** If you are an internal tester, you can use TestFlight, but **TestFlight does not run on the Simulator**. It requires a real device.
-3.  **Cloud Device Farms (The Only Solution):** To test a production app from the App Store without owning the device, you **must** use a cloud service like BrowserStack or AWS Device Farm. These services provide access to *real* physical devices remotely, which have the App Store installed.
+## Test Scenarios
 
-### Android (Google Play Store)
-Unlike iOS, the Android Emulator **can** include the Google Play Store.
-
-1.  **Create a Play Store Enabled Device:**
-    - Open Android Studio > Device Manager > Create Device.
-    - Look for a device icon with the **Google Play Store logo** (a small triangle) next to it (e.g., Pixel 5).
-    - Select a system image that says "Google Play".
-2.  **Sign In:** Launch the emulator, open the Play Store app, and sign in with your Google account.
-3.  **Download & Test:** You can now search for and install any app directly from the Play Store, just like on a real phone.
-
-## 5. Cloud Device Farms (Third-Party Services)
-
-If you need to test on a specific device you don't have, or need to test on many devices simultaneously, cloud platforms are excellent alternatives.
-
-*   **BrowserStack**: Offers real iOS and Android devices accessible via your browser.
-*   **Sauce Labs**: Similar to BrowserStack, with extensive automation support.
-*   **AWS Device Farm**: Amazon's service for testing on real devices in the cloud.
-
-## 6. Browser Developer Tools (For Mobile Web)
-
-If you are testing a mobile website or a Progressive Web App (PWA), you can use your desktop browser.
-
-*   **Chrome/Edge**: Right-click > **Inspect** > Click the **Device Toggle** icon (phone/tablet) in the top-left of the inspector.
-*   **Safari**: Go to **Develop** > **Enter Responsive Design Mode**.
-
-## Test Automation Framework: MyObservatory 9-Day Forecast
-
-This project uses Python, Appium, and Behave (BDD) to automate test cases for the MyObservatory app's 9-Day Forecast feature.
-
-### Structure
-- `features/9_day_forecast.feature`: Gherkin scenarios for the 9-Day Forecast
-- `features/steps/`: Step definitions for Behave
-- `utils/appium_driver.py`: Appium driver setup
-
-### Setup
-1. Install Python 3.9+
-2. Create and activate a virtual environment
-3. Install dependencies:
-   ```sh
-   pip install behave appium-python-client
-   ```
-4. Start the Appium server:
-   ```sh
-   appium
-   ```
-5. Update `utils/appium_driver.py` with your app path and device details.
-
-### Running Tests
-```sh
-behave features/9_day_forecast.feature
-```
-
-### Notes
-- Ensure the Appium server is running and the iOS simulator/device is available.
-- Scenarios are based on the requirements in `test_cases_9_day_forecast.md`.
-
-## Summary of Your Environment
-
-*   **iOS**: ✅ Ready. You have Xcode 26.3 and simulators for iPhone 17, 16, and various iPads.
-*   **Android**: ❌ Not detected. You need to install Android Studio.
+The `features/9_day_forecast.feature` file covers the following scenarios:
+1.  Navigation to the 9-Day Forecast page.
+2.  Back navigation to the previous screen.
+3.  Verification of UI elements (Title, General Situation, Forecast List).
+4.  Pull-to-refresh functionality.
+5.  Language Switching to Traditional Chinese.
+6.  Behavior with No Internet Connection.
+7.  App Background/Foreground behavior.
+8.  Probability of Significant Rain (PSR) display.
+9.  Layout on different screen sizes.
+10. Dark Mode Support.
+11. Data Freshness verification.
+12. Scrolling functionality.
+13. Share Functionality.
+14. Orientation Change handling.

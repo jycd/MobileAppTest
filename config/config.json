@@ -1,0 +1,10 @@
+{
+    "app_path": "/path/to/MyObservatory.app",
+    "platform_name": "iOS",
+    "device_name": "iPhone Simulator",
+    "platform_version": "17.2",
+    "appium_url": "http://localhost:4723",
+    "new_command_timeout": 300,
+    "automation_name_ios": "XCUITest",
+    "automation_name_android": "UiAutomator2"
+}
